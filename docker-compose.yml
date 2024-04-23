@@ -1,0 +1,42 @@
+services:
+  frontend:
+    env_file:
+      - .env
+    build:
+      dockerfile: ./docker/Dockerfile-frontend
+    ports:
+      - "${FRONTEND_PORT}:3000"
+    volumes:
+      - "./frontend:/app"
+      - "/app/node_modules"
+
+  backend:
+    env_file:
+      - .env
+    build:
+      dockerfile: ./docker/Dockerfile-backend
+    ports:
+      - "${BACKEND_PORT}:3000"
+    volumes:
+      - "./backend:/app"
+      - "/app/node_modules"
+    depends_on:
+      - db
+
+  db:
+    image: mysql:8.3
+    env_file:
+      - .env
+    ports:
+      - "${MYSQL_PORT}:3306"
+    volumes:
+      - "./db:/var/lib/mysql"
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "8080:80"
+    env_file:
+      - .env
+    depends_on:
+      - db
